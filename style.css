@@ -1,0 +1,723 @@
+/* ================================
+   全体
+================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans JP",
+        sans-serif;
+
+    background: #f4f5f7;
+    color: #222;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+
+/* ================================
+   ヘッダー
+================================ */
+
+header {
+    background: #222;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+header p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    opacity: 0.75;
+}
+
+
+/* ================================
+   メイン
+================================ */
+
+main {
+    width: min(1100px, 95%);
+    margin: 20px auto 50px;
+}
+
+
+/* ================================
+   セクション
+================================ */
+
+section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+section h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+}
+
+.section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.section-title-row h2 {
+    margin: 0;
+}
+
+
+/* ================================
+   映画館・日付
+================================ */
+
+.input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-group label {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.input-group input,
+.input-group select {
+    height: 42px;
+
+    border: 1px solid #ccc;
+    border-radius: 7px;
+
+    padding: 0 10px;
+
+    font-size: 16px;
+
+    background: white;
+}
+
+#theater {
+    min-width: 220px;
+}
+
+#scheduleDate {
+    width: 170px;
+}
+
+#fetchScheduleButton {
+    min-width: 190px;
+}
+
+#fetchScheduleButton:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+#fetchStatus {
+    margin: 14px 0 0;
+
+    color: #666;
+
+    font-size: 13px;
+}
+
+
+/* ================================
+   ボタン
+================================ */
+
+button {
+    height: 42px;
+
+    border: none;
+    border-radius: 7px;
+
+    padding: 0 18px;
+
+    background: #222;
+    color: white;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+
+/* ================================
+   映画選択
+================================ */
+
+.movie-selection-actions {
+    display: flex;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+.movie-selection-actions button {
+    height: 36px;
+
+    padding: 0 12px;
+
+    font-size: 13px;
+}
+
+#movieSelectionList {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.movie-selection-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    min-height: 46px;
+
+    padding: 10px 14px;
+
+    background: #f7f7f7;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.movie-selection-item:hover {
+    background: #eeeeee;
+
+    border-color: #c8c8c8;
+}
+
+.movie-selection-item:has(input:checked) {
+    background: #f0f0f0;
+
+    border-color: #999;
+}
+
+.movie-selection-item input[type="checkbox"] {
+    flex-shrink: 0;
+
+    width: 18px;
+    height: 18px;
+
+    margin: 0;
+}
+
+.movie-selection-item span:nth-child(2) {
+    flex: 1;
+
+    min-width: 0;
+
+    white-space: normal;
+
+    overflow-wrap: anywhere;
+
+    line-height: 1.4;
+}
+
+.screening-count {
+    flex-shrink: 0;
+
+    padding: 3px 8px;
+
+    font-size: 12px;
+
+    background: #e5e5e5;
+
+    border-radius: 12px;
+
+    color: #555;
+}
+
+
+/* ================================
+   タイムライン
+================================ */
+
+.timeline-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 8px;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+#timeline {
+    min-width: max-content;
+}
+
+
+/* ================================
+   タイムライン ヘッダー
+================================ */
+
+.timeline-header {
+    display: grid;
+
+    grid-template-columns:
+        50px
+        repeat(
+            var(--movie-count, 1),
+            100px
+        );
+
+    min-width: max-content;
+
+    height: 62px;
+
+    border-bottom: 1px solid #ccc;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 10;
+
+    background: white;
+}
+
+
+/* ================================
+   時間タイトル
+================================ */
+
+.timeline-time-label {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-right: 1px solid #ddd;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    color: #666;
+}
+
+
+/* ================================
+   映画タイトル
+================================ */
+
+.timeline-movie-header {
+    min-width: 100px;
+
+    max-width: 100px;
+
+    padding: 4px 4px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    line-height: 1.15;
+
+    border-right: 1px solid #ddd;
+
+    overflow-wrap: anywhere;
+
+    overflow: hidden;
+
+    word-break: break-word;
+}
+
+.timeline-movie-header[data-movie-name] {
+    cursor: grab;
+}
+
+.timeline-movie-header[data-movie-name]:active {
+    cursor: grabbing;
+}
+
+.timeline-movie-header:hover {
+    background: #f0f0f0;
+}
+
+
+/* ================================
+   タイムライン本体
+================================ */
+
+.timeline-body {
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        50px
+        repeat(
+            var(--movie-count, 1),
+            100px
+        );
+
+    min-width: max-content;
+}
+
+
+/* ================================
+   時間軸
+================================ */
+
+.timeline-time-axis {
+    position: relative;
+
+    border-right: 1px solid #ccc;
+
+    background: #fafafa;
+}
+
+
+/* ================================
+   時間ラベル
+================================ */
+
+.timeline-time {
+    position: absolute;
+
+    left: 0;
+
+    width: 50px;
+
+    transform: translateY(-50%);
+
+    padding-right: 3px;
+
+    text-align: center;
+
+    font-size: 9px;
+
+    color: #666;
+
+    white-space: nowrap;
+
+    pointer-events: none;
+
+    z-index: 5;
+}
+
+
+/* ================================
+   映画レーン
+================================ */
+
+.timeline-lane {
+    position: relative;
+
+    min-width: 100px;
+
+    max-width: 100px;
+
+    border-right: 1px solid #ddd;
+
+    background: white;
+
+    overflow: hidden;
+}
+
+.timeline-lane[draggable="true"] {
+    cursor: grab;
+}
+
+.timeline-lane[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.timeline-lane:hover {
+    background: #fafafa;
+}
+
+
+/* ================================
+   30分ごとの線
+================================ */
+
+.timeline-lane-line {
+    position: absolute;
+
+    left: 0;
+
+    right: 0;
+
+    height: 1px;
+
+    background: #eeeeee;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+
+/* ================================
+   上映時間バー
+================================ */
+
+.timeline-lane .movie-bar {
+    position: absolute;
+
+    left: 4px;
+
+    right: 4px;
+
+    width: auto !important;
+
+    min-height: 22px;
+
+    border-radius: 4px;
+
+    background: #444;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 2px 3px;
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    line-height: 1.1;
+
+    text-align: center;
+
+    white-space: normal;
+
+    overflow: hidden;
+
+    overflow-wrap: anywhere;
+
+    word-break: break-word;
+
+    z-index: 2;
+}
+
+
+/* ================================
+   ドラッグ中
+================================ */
+
+.timeline-dragging {
+    opacity: 0.45;
+}
+
+
+/* ================================
+   映画がない場合
+================================ */
+
+.empty-message {
+    color: #999;
+
+    text-align: center;
+
+    padding: 20px;
+
+    font-size: 14px;
+}
+
+
+/* ================================
+   スマホ
+================================ */
+
+@media (max-width: 600px) {
+
+    header {
+        padding: 16px;
+    }
+
+
+    header h1 {
+        font-size: 20px;
+    }
+
+
+    main {
+        width: 100%;
+
+        margin: 0;
+    }
+
+
+    section {
+        border-radius: 0;
+
+        margin-bottom: 10px;
+
+        padding: 16px;
+    }
+
+
+    .section-title-row {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+
+    .section-title-row > div {
+        width: 100%;
+    }
+
+
+    .section-title-row > div button {
+        flex: 1;
+    }
+
+
+    .input-row {
+        display: grid;
+
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 10px;
+    }
+
+
+    .input-group:first-child {
+        grid-column:
+            1 / -1;
+    }
+
+
+    #theater,
+    #scheduleDate {
+        width: 100%;
+
+        min-width: 0;
+    }
+
+
+    .input-row button {
+        grid-column:
+            1 / -1;
+
+        width: 100%;
+    }
+
+
+    .timeline-wrapper {
+        margin: 0 -16px;
+
+        padding: 0 16px;
+
+        border-left: none;
+
+        border-right: none;
+
+        border-radius: 0;
+    }
+
+
+    #timeline {
+        min-width: max-content;
+    }
+
+
+    .timeline-movie-header,
+    .timeline-lane {
+        min-width: 100px;
+
+        max-width: 100px;
+    }
+
+
+    .timeline-movie-header {
+        padding: 4px 3px;
+
+        font-size: 9px;
+
+        line-height: 1.1;
+    }
+
+
+    .timeline-lane .movie-bar {
+        left: 4px;
+
+        right: 4px;
+
+        padding: 2px 3px;
+
+        font-size: 9px;
+    }
+
+}
