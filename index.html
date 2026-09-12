@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Movie Timeline</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h1>🎬 Movie Timeline</h1>
+    <p>映画の上映時間をタイムラインで比較</p>
+</header>
+
+<main>
+
+    <!-- 映画館・日付 -->
+    <section class="movie-input">
+        <h2>上映情報を取得</h2>
+
+        <div class="input-row">
+
+            <div class="input-group">
+                <label for="theater">映画館</label>
+
+                <select id="theater">
+                    <option value="forum">フォーラム盛岡</option>
+                    <option value="ezuriko">イオンシネマ江釣子</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="scheduleDate">日付</label>
+
+                <input
+                    type="date"
+                    id="scheduleDate"
+                >
+            </div>
+
+            <button id="fetchScheduleButton">
+                🔄 上映情報を取得
+            </button>
+
+        </div>
+
+        <p id="fetchStatus"></p>
+    </section>
+
+
+    <!-- 映画選択 -->
+    <section class="movie-selection">
+
+        <div class="section-title-row">
+            <h2>表示する映画</h2>
+
+            <div>
+                <button id="selectAllButton">
+                    すべて選択
+                </button>
+
+                <button id="deselectAllButton">
+                    すべて解除
+                </button>
+            </div>
+        </div>
+
+        <div id="movieSelectionList">
+            <p class="empty-message">
+                まず上映情報を取得してください
+            </p>
+        </div>
+
+    </section>
+
+
+    <!-- タイムライン -->
+    <section class="timeline-section">
+
+        <div class="section-title-row">
+            <h2>上映時間</h2>
+
+            <div class="input-group">
+                <label for="sortOrder">並び順</label>
+
+                <select id="sortOrder">
+                    <option value="start">
+                        上映開始時間が早い順
+                    </option>
+
+                    <option value="end">
+                        上映終了時間が早い順
+                    </option>
+
+                    <option value="name">
+                        映画タイトル順
+                    </option>
+
+                    <option value="custom">
+                        自分で並べた順
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="timeline-wrapper">
+            <div id="timeline"></div>
+        </div>
+
+    </section>
+
+</main>
+
+<script src="app.js"></script>
+
+</body>
+</html>
