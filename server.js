@@ -145,6 +145,19 @@ app.get("/api/ezuriko", async (req, res) => {
 
         const page = await browser.newPage();
 
+        page.on("response", async (response) => {
+    const url = response.url();
+    const contentType = response.headers()["content-type"] || "";
+
+    if (
+        contentType.includes("json") ||
+        url.includes("api") ||
+        url.includes("schedule")
+    ) {
+        console.log("通信:", response.status(), contentType, url);
+    }
+});
+
         const url =
             `https://theater.aeoncinema.com/theaters/ezuriko/?date=${date.replace(/-/g, "")}`;
 
