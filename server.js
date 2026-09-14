@@ -46,7 +46,6 @@ app.get("/api/forum", async (req, res) => {
 
         const movies = await page.evaluate(() => {
             const results = [];
-
             const text = document.body.innerText;
 
             const lines = text
@@ -57,15 +56,12 @@ app.get("/api/forum", async (req, res) => {
             let currentMovie = null;
 
             for (const line of lines) {
-
                 const timeMatches = line.match(
                     /\b\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}\b/g
                 );
 
                 if (timeMatches && currentMovie) {
-
                     for (const time of timeMatches) {
-
                         const parts = time
                             .split("-")
                             .map(x => x.trim());
@@ -99,9 +95,7 @@ app.get("/api/forum", async (req, res) => {
             return results;
         });
 
-        console.log(
-            `${movies.length}件の上映情報を取得しました`
-        );
+        console.log(`${movies.length}件の上映情報を取得しました`);
 
         res.json({
             success: true,
@@ -110,7 +104,6 @@ app.get("/api/forum", async (req, res) => {
         });
 
     } catch (error) {
-
         console.error("取得エラー:", error);
 
         res.status(500).json({
@@ -119,7 +112,6 @@ app.get("/api/forum", async (req, res) => {
         });
 
     } finally {
-
         if (browser) {
             await browser.close();
         }
@@ -132,7 +124,6 @@ app.get("/api/forum", async (req, res) => {
 // ========================================
 
 app.get("/api/ezuriko", async (req, res) => {
-
     const date = req.query.date;
 
     if (!date) {
@@ -145,7 +136,6 @@ app.get("/api/ezuriko", async (req, res) => {
     let browser;
 
     try {
-
         console.log("イオンシネマ江釣子を取得中...");
         console.log("日付:", date);
 
@@ -166,15 +156,150 @@ app.get("/api/ezuriko", async (req, res) => {
         });
 
         await page.waitForTimeout(1500);
-        
+
+
+        // ========================================
+        // 江釣子ページ診断
+        // ========================================
+
         const bodyText = await page.locator("body").innerText();
+        const html = await page.content();
 
-console.log("ページタイトル:", await page.title());
-console.log("本文の文字数:", bodyText.length);
-console.log("上映時間の件数:", (bodyText.match(/上映時間/g) || []).length);
-console.log("本文末尾:", bodyText.slice(-5000));
+        console.log("");
+        console.log("========================================");
+        console.log(" 江釣子ページ診断");
+        console.log("========================================");
+
+        console.log("ページタイトル:", await page.title());
+
+        console.log("本文の文字数:", bodyText.length);
+
+        console.log(
+            "HTMLの文字数:",
+            html.length
+        );
+
+        console.log(
+            "本文の「上映時間」件数:",
+            (bodyText.match(/上映時間/g) || []).length
+        );
+
+        console.log(
+            "HTMLの「上映時間」件数:",
+            (html.match(/上映時間/g) || []).length
+        );
+
+        console.log(
+            "本文の時刻件数:",
+            (bodyText.match(/\b\d{1,2}:\d{2}\b/g) || []).length
+        );
+
+        console.log(
+            "HTMLの時刻件数:",
+            (html.match(/\b\d{1,2}:\d{2}\b/g) || []).length
+        );
 
 
+        // ----------------------------------------
+        // 本文先頭
+        // ----------------------------------------
+
+        console.log("");
+        console.log("---------- 本文先頭 ----------");
+        console.log(bodyText.slice(0, 5000));
+
+
+        // ----------------------------------------
+        // 本文末尾
+        // ----------------------------------------
+
+        console.log("");
+        console.log("---------- 本文末尾 ----------");
+        console.log(bodyText.slice(-5000));
+
+
+        // ----------------------------------------
+        // 「上映時間」の周辺
+        // ----------------------------------------
+
+        console.log("");
+        console.log("---------- 「上映時間」周辺 ----------");
+
+        const runtimeIndex = bodyText.indexOf("上映時間");
+
+        if (runtimeIndex >= 0) {
+            console.log(
+                bodyText.slice(
+                    Math.max(0, runtimeIndex - 1000),
+                    runtimeIndex + 5000
+                )
+            );
+        } else {
+            console.log(
+                "本文には「上映時間」がありません"
+            );
+        }
+
+
+        // ----------------------------------------
+        // 最初の時刻の周辺
+        // ----------------------------------------
+
+        console.log("");
+        console.log("---------- 最初の時刻周辺 ----------");
+
+        const timeMatch = bodyText.match(
+            /\b\d{1,2}:\d{2}\b/
+        );
+
+        if (timeMatch) {
+            const timeIndex = bodyText.indexOf(timeMatch[0]);
+
+            console.log(
+                bodyText.slice(
+                    Math.max(0, timeIndex - 1000),
+                    timeIndex + 5000
+                )
+            );
+        } else {
+            console.log(
+                "本文には時刻がありません"
+            );
+        }
+
+
+        // ----------------------------------------
+        // HTML内の「上映時間」の周辺
+        // ----------------------------------------
+
+        console.log("");
+        console.log("---------- HTML内の「上映時間」周辺 ----------");
+
+        const htmlRuntimeIndex = html.indexOf("上映時間");
+
+        if (htmlRuntimeIndex >= 0) {
+            console.log(
+                html.slice(
+                    Math.max(0, htmlRuntimeIndex - 2000),
+                    htmlRuntimeIndex + 10000
+                )
+            );
+        } else {
+            console.log(
+                "HTMLにも「上映時間」がありません"
+            );
+        }
+
+        console.log("");
+        console.log("========================================");
+        console.log(" 江釣子ページ診断終了");
+        console.log("========================================");
+        console.log("");
+
+
+        // ========================================
+        // 江釣子上映情報解析
+        // ========================================
 
         const movies = await page.evaluate(() => {
 
@@ -185,7 +310,6 @@ console.log("本文末尾:", bodyText.slice(-5000));
 
             const results = [];
 
-
             for (let i = 0; i < lines.length; i++) {
 
                 // 「上映時間：○分」を探す
@@ -195,7 +319,6 @@ console.log("本文末尾:", bodyText.slice(-5000));
                     continue;
                 }
 
-
                 // 上映時間の直前の行をタイトルとする
                 let title = lines[i - 1] || "";
 
@@ -203,7 +326,6 @@ console.log("本文末尾:", bodyText.slice(-5000));
                 title = title
                     .replace(/^\[NEW\]\s*/, "")
                     .trim();
-
 
                 // 明らかなUI文字を除外
                 const invalidTitles = [
@@ -227,7 +349,6 @@ console.log("本文末尾:", bodyText.slice(-5000));
                     continue;
                 }
 
-
                 // この映画の上映時間を探す
                 let j = i + 1;
 
@@ -240,10 +361,8 @@ console.log("本文末尾:", bodyText.slice(-5000));
                         break;
                     }
 
-
                     const start = lines[j];
                     const endLine = lines[j + 1] || "";
-
 
                     // 例
                     // 09:15
@@ -252,7 +371,6 @@ console.log("本文末尾:", bodyText.slice(-5000));
                         /^\d{1,2}:\d{2}$/.test(start) &&
                         /^~\s*\d{1,2}:\d{2}$/.test(endLine)
                     ) {
-
                         const end = endLine
                             .replace(/^~\s*/, "");
 
@@ -265,16 +383,13 @@ console.log("本文末尾:", bodyText.slice(-5000));
                         j += 2;
 
                     } else {
-
                         j++;
                     }
                 }
 
-
                 // 次の映画へ
                 i = j - 1;
             }
-
 
             return results;
         });
@@ -287,7 +402,6 @@ console.log("本文末尾:", bodyText.slice(-5000));
         console.log("取得した上映情報:");
 
         for (const movie of movies) {
-
             console.log(
                 `${movie.name} ${movie.start}-${movie.end}`
             );
@@ -299,7 +413,6 @@ console.log("本文末尾:", bodyText.slice(-5000));
             date: date,
             movies: movies
         });
-
 
     } catch (error) {
 
