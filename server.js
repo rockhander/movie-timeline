@@ -166,6 +166,9 @@ app.get("/api/ezuriko", async (req, res) => {
         });
 
         await page.waitForTimeout(1500);
+        
+        console.log("ページタイトル:", await page.title());
+        console.log("本文先頭:", (await page.locator("body").innerText()).slice(0, 3000));
 
 
         const movies = await page.evaluate(() => {
